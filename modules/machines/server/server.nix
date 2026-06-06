@@ -15,6 +15,7 @@ in
         server
         sudha
         erpnext
+        cloudflared
       ];
     }; 
   };
