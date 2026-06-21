@@ -7,7 +7,7 @@ flakeContext@{ inputs, ... }:
   configurations.nixos = {
     "protoplast-server" = {
       system = "x86_64-linux";
-      module = { config, ... }:
+      module = { config, pkgs, ... }:
       let
         hostName = "server";
       in
@@ -35,6 +35,37 @@ flakeContext@{ inputs, ... }:
           extraGroups = [ "wheel" ];          
           # hashedPasswordFile = config.sops.secrets."sudha-login-password".path;
         };
+
+        users.groups.cloudflared = {};
+        users.users.cloudflared = {
+          isSystemUser = true;
+          group = "cloudflared";
+        };
+        sops.secrets."cloudflare" = {
+          sopsFile = "${inputs.self}/secrets/${hostName}.yaml";
+          format = "yaml";
+          owner = config.users.users.cloudflared.name;
+          group = config.users.groups.cloudflared.name;
+        };
+      
+        systemd.services.cloudflared-tunnel = {
+          description = "Cloudflared Remotely Managed Tunnel";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "network-online.target" ];
+          serviceConfig = {
+            User = "cloudflared"; Group = "cloudflared";
+            ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run";
+            # "TUNNEL_TOKEN=...", cloudflared will pick it up automatically
+            EnvironmentFile = config.sops.secrets."cloudflare".path;
+            Restart = "always";
+            RestartSec = "5s";
+            # Extra security hardening (optional but recommended since we removed DynamicUser)
+            NoNewPrivileges = true;
+            ProtectSystem = "strict";
+            ProtectHome = true;
+          };
+        };
+        
         # command to generate yggdrasil key
         # nix run nixpkgs#yggdrasil -- -useconffile <(yggdrasil -genconf -json) -exportkey
         sops.secrets."yggdrasil" = {
