@@ -16,14 +16,7 @@
       kernelPackages = pkgs.linuxPackages_latest;
       extraModulePackages = [ config.boot.kernelPackages.zenpower ];
       kernelModules = [ "kvm-intel" ];
-      # NATIVE TPM LUKS BINDING
-      # Crucial: We bind strictly to pcr7 (Secure Boot certificate validation).
-      # This prevents any NVIDIA module updates from breaking the automated unlock flow.
-      initrd.luks.devices."enc".crypttabExtraOpts = [ 
-        "tpm2-device=auto"
-        "tpm2-pcrs=7" 
-      ];
-  
+      
       # Standard systemd-boot must be turned OFF for lanzaboote to manage the EFI stub
       loader.systemd-boot.enable = lib.mkForce false;
       loader.efi.canTouchEfiVariables = true;
@@ -33,10 +26,6 @@
       lanzaboote = {
         enable = true;
         pkiBundle = "/etc/secureboot";
-        autoGenerateKeys.enable = true; 
-        autoEnrollKeys = {
-          enable = true;
-        };
       };
   
       initrd.availableKernelModules = [ 
@@ -71,17 +60,9 @@
               root = {
                 size = "100%";
                 content = {
-                  type = "luks";
-                  name = "enc"; # The mapped name in /dev/mapper/crypted
-                  settings = {
-                    allowDiscards = true; # Crucial for NVMe SSD health (TRIM)
-                  };
-                  # The actual filesystem inside the LUKS container
-                  content = {
-                    type = "filesystem";
-                    format = "ext4";
-                    mountpoint = "/";
-                  };
+                  type = "filesystem";
+                  format = "ext4";
+                  mountpoint = "/";
                 };
               };
             };
