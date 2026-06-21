@@ -1,1 +1,16 @@
 # server
+
+# This creates a file named 'key.txt' containing your private key
+nix run nixpkgs#age-keygen -- -o key.txt
+age-keygen -o key.txt
+
+# This will ask you to enter a passphrase
+nix run nixpkgs#age -- -p -o key.txt.age key.txt
+age -p -o key.txt.age key.txt
+
+ssh-keygen -t ed25519 -f <path> -C "name"
+
+env -u SOPS_AGE_KEY_FILE SOPS_AGE_KEY=$(nix run nixpkgs#age -- -d secrets/protoplast.age 2>/dev/null | grep AGE-SECRET-KEY) nix run nixpkgs#sops -- secrets/server.yaml
+
+sudo SOPS_AGE_KEY_FILE=/etc/laptopboot.txt EDITOR=nano sops secrets/laptop.yaml
+
