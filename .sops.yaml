@@ -1,9 +1,9 @@
 keys:
   - &protoplast age1kwqlntk6nms2nfy3ansvuch5dhqgy6lrczeqq0nw43ccw3ymafuqh7care
-  # - &serverboot <public key>
+  - &serverboot age1fmc7v9hzzhw829nuc6lwlvxp5nnqjqahza3rnygdjt35yalzvy0q83d4ua
 creation_rules:
   - path_regex: secrets/server.yaml$
     key_groups:
       - age:
           - *protoplast
-          # - *serverboot
+          - *serverboot
