@@ -18,15 +18,8 @@
       kernelModules = [ "kvm-intel" ];
       
       # Standard systemd-boot must be turned OFF for lanzaboote to manage the EFI stub
-      loader.systemd-boot.enable = lib.mkForce false;
+      loader.systemd-boot.enable = true;
       loader.efi.canTouchEfiVariables = true;
-  
-      # LANZABOOTE SECURE BOOT
-      # LANZABOOTE V1.0.0 STANDARD CONFIGURATION
-      lanzaboote = {
-        enable = true;
-        pkiBundle = "/etc/secureboot";
-      };
   
       initrd.availableKernelModules = [ 
         "nvme" "xhci_pci" "usb_storage" "usbhid" "sd_mod" "tpm_crb" "tpm_tis" 
