@@ -12,6 +12,8 @@ ssh-keygen -t ed25519 -f <path> -C "name"
 
 env -u SOPS_AGE_KEY_FILE SOPS_AGE_KEY=$(nix run nixpkgs#age -- -d secrets/protoplast.age 2>/dev/null | grep AGE-SECRET-KEY) nix run nixpkgs#sops -- secrets/server.yaml
 
+env -u SOPS_AGE_KEY_FILE SOPS_AGE_KEY=$(nix run nixpkgs#age -- -d secrets/protoplast.age 2>/dev/null | grep AGE-SECRET-KEY) nix run nixpkgs#sops -- updatekeys secrets/server.yaml
+
 sudo SOPS_AGE_KEY_FILE=/etc/laptopboot.txt EDITOR=nano sops secrets/laptop.yaml
 
 nix --extra-experimental-features "nix-command flakes" run nixpkgs#age-plugin-tpm -- --generate -o /etc/serverboot.txt
