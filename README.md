@@ -10,7 +10,18 @@ age -p -o key.txt.age key.txt
 
 ssh-keygen -t ed25519 -f <path> -C "name"
 
-env -u SOPS_AGE_KEY_FILE SOPS_AGE_KEY=$(nix run nixpkgs#age -- -d secrets/protoplast.age 2>/dev/null | grep AGE-SECRET-KEY) nix run nixpkgs#sops -- secrets/server.yaml
+env -u SOPS_AGE_KEY_FILE SOPS_AGE_KEY=$(nix run nixpkgs#age -- -d secrets/protoplast.age 2>/dev/null | grep AGE-SECRET-KEY) nix run nixpkgs#sops -- secrets/serkeys:
+  - &protoplast age1kwqlntk6nms2nfy3ansvuch5dhqgy6lrczeqq0nw43ccw3ymafuqh7care
+  - &serverboot age1fmc7v9hzzhw829nuc6lwlvxp5nnqjqahza3rnygdjt35yalzvy0q83d4ua
+creation_rules:
+  - path_regex: secrets/server.yaml$
+    key_groups:
+      - age:
+          - *protoplast
+          - *serverboot
+
+
+i did that already right now its correct ver.yaml
 
 env -u SOPS_AGE_KEY_FILE SOPS_AGE_KEY=$(nix run nixpkgs#age -- -d secrets/protoplast.age 2>/dev/null | grep AGE-SECRET-KEY) nix run nixpkgs#sops -- updatekeys secrets/server.yaml
 

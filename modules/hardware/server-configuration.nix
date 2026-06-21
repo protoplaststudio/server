@@ -13,6 +13,7 @@
     programs.nix-ld.enable = true;
     system.stateVersion = "26.05";
     time.timeZone = "Asia/Kolkata";
+    services.timesyncd.enable = true;
     i18n.defaultLocale = "en_US.UTF-8";
     console.keyMap = "us";
     virtualisation.docker.enable = true;
