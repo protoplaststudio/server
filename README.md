@@ -36,3 +36,5 @@ NIX_CONFIG="experimental-features = nix-command flakes pipe-operators" nix run n
 
 NIX_CONFIG="experimental-features = nix-command flakes pipe-operators" nixos-install --flake github:protoplaststudio/server#protoplast-server
 
+NIX_CONFIG="experimental-features = nix-command flakes pipe-operators" nixos rebuild switch --flake github:protoplaststudio/server#protoplast-server
+

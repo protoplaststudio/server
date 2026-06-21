@@ -18,7 +18,6 @@
     console.keyMap = "us";
     virtualisation.docker.enable = true;
     services = {
-      printing.enable = true;
       openssh.enable = true;
       pipewire = {
         enable = true;
@@ -31,10 +30,6 @@
         enable = true;
         nssmdns4 = true; 
       };
-      ollama = {
-        enable = true;
-      };
-      pcscd.enable = true;
     };
     
     environment.variables = {
