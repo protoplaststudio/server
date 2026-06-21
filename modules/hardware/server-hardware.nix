@@ -4,6 +4,7 @@
 
     imports = [ 
       inputs.disko.nixosModules.disko
+      inputs.lanzaboote.nixosModules.lanzaboote # Inject Secure Boot framework
       (modulesPath + "/installer/scan/not-detected.nix") 
     ];
     
