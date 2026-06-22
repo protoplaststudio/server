@@ -39,40 +39,7 @@
         enable = true;
         nssmdns4 = true; 
       };
-      
-      postgresql = {
-        enable = true;
-        package = pkgs.postgresql_18;
-        dataDir = "/mnt/data/postgresql/data";
-        
-        settings = {
-          # Use the wildcard to avoid the Docker race condition on boot
-          listen_addresses = lib.mkForce "*";
-        };
-  
-        authentication = pkgs.lib.mkOverride 10 ''
-          # TYPE  DATABASE        USER            ADDRESS                 METHOD
-          
-          # 1. ALLOW SYSTEM ADMIN: The 'postgres' superuser must use OS-level 'peer' auth
-          local   all             postgres                                peer
-          
-          # 2. ALLOW LOCAL SCRIPTS: Let your systemd scripts (like tb-init) connect locally
-          local   all             all                                     trust
-          
-          # 3. LOCK DOWN NETWORK: Require strict passwords for local TCP
-          host    all             all             samehost                scram-sha-256
-          
-          # 4. LOCK DOWN DOCKER: Require strict passwords for containers
-          host    all             all             172.17.0.0/16           scram-sha-256
-        '';
-      };
     };
-
-    systemd.tmpfiles.rules = [
-      "d /mnt/data/postgresql 0750 postgres postgres -"
-      "d /mnt/data/postgresql/data 0700 postgres postgres -"      
-      "d /mnt/data/docker 0711 root root -"
-    ];
     
     environment.variables = {
       EDITOR = "nano"; VISUAL = "nano"; 
@@ -131,6 +98,28 @@
           }
         ];
       };
+    };
+    systemd.services.cloudflared-tunnel = {
+      description = "Cloudflared Remotely Managed Tunnel";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network-online.target" ];
+      serviceConfig = {
+        User = "cloudflared"; Group = "cloudflared";
+        ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run";
+        # "TUNNEL_TOKEN=...", cloudflared will pick it up automatically
+        EnvironmentFile = config.sops.secrets."cloudflare".path;
+        Restart = "always";
+        RestartSec = "5s";
+        # Extra security hardening (optional but recommended since we removed DynamicUser)
+        NoNewPrivileges = true;
+        ProtectSystem = "strict";
+        ProtectHome = true;
+      };
+    };
+    users.groups.cloudflared = {};
+    users.users.cloudflared = {
+      isSystemUser = true;
+      group = "cloudflared";
     };
     networking.firewall = {
       trustedInterfaces = [ "docker0" ]; 

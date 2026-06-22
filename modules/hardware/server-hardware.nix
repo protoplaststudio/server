@@ -17,18 +17,13 @@
       extraModulePackages = [ config.boot.kernelPackages.zenpower ];
       kernelModules = [ "kvm-intel" ];
       
-      # Standard systemd-boot must be turned OFF for lanzaboote to manage the EFI stub
-      loader.systemd-boot.enable = lib.mkForce false;
-      loader.efi.canTouchEfiVariables = false;
-
-      # Enable GRUB as the universal bootloader
       loader.grub = {
         enable = true;
-        efiSupport = true;
-        # --- THE FIX ---
-        # Tells GRUB to put the EFI file in the default /EFI/BOOT/BOOTX64.EFI location
-        # and prevents it from running efibootmgr (which is crashing)
-        efiInstallAsRemovable = true; 
+        
+        # Explicitly turn off all modern EFI features
+        efiSupport = false; 
+        
+        # Install GRUB directly to the master boot record of the physical drive
         device = lib.mkDefault "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5"; 
       };
   
@@ -44,51 +39,27 @@
     disko.devices = {
       disk = {
         main = {
-          device = lib.mkDefault "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5"; 
+          device = "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5"; 
           type = "disk";
           content = {
             type = "gpt";
-            partitions = {                                      
+            partitions = {
               bios_boot = {
-                start = "1M";
-                end = "2M";
-                type = "EF02";       
-              };
-              ESP = {
-                start = "3M";
-                end = "1027M";    # Exactly 1024M (1GB) in size
-                type = "EF00";
-                content = {
-                  type = "filesystem";
-                  format = "vfat";
-                  mountpoint = "/boot";
-                  mountOptions = [ "umask=0077" ];
-                };
+                size = "1M";
+                type = "EF02"; 
               };
               root = {
-                start = "1028M";
-                end = "102400M";     # Stops precisely at the 100G marker
+                size = "100%";
                 content = {
                   type = "filesystem";
                   format = "ext4";
                   mountpoint = "/";
                 };
               };
-              data = {
-                start = "102401M";    
-                size = "100%"; 
-              };
             };          
           };
         };
       };
-    };
-    # mkfs.ext4 /dev/sda4
-    # mount -a
-    fileSystems."/mnt/data" = {
-      device = "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5-part4"; 
-      fsType = "ext4"; 
-      options = [ "nofail" ];
     };
   };
 }
