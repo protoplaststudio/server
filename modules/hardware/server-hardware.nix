@@ -52,8 +52,8 @@
                 type = "EF02";       
               };
               ESP = {
-                start = "2M";
-                end = "1026M";     
+                start = "3M";
+                end = "1027M";    # Exactly 1024M (1GB) in size
                 type = "EF00";
                 content = {
                   type = "filesystem";
@@ -63,8 +63,8 @@
                 };
               };
               root = {
-                start = "1026M";
-                end = "100G";      
+                start = "1028M";
+                end = "102400M";     # Stops precisely at the 100G marker
                 content = {
                   type = "filesystem";
                   format = "ext4";
@@ -72,7 +72,7 @@
                 };
               };
               data = {
-                start = "100G";    
+                start = "102401M";    
                 end = "100%"; 
               };
             };          
