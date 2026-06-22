@@ -57,6 +57,7 @@
           host    all             all             172.17.0.1/32           trust
         '';
       };
+    };
 
     systemd.tmpfiles.rules = [
       # The 'z' type ensures permissions are applied recursively 
