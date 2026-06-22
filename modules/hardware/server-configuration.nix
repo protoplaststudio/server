@@ -19,7 +19,13 @@
     services.timesyncd.enable = true;
     i18n.defaultLocale = "en_US.UTF-8";
     console.keyMap = "us";
-    virtualisation.docker.enable = true;
+    virtualisation.docker = {
+      enable = true;
+      # Tell Docker to live entirely inside your persistent vault
+      daemon.settings = {
+        data-root = "/mnt/data/docker";
+      };
+    };
     services = {
       openssh.enable = true;
       pipewire = {
@@ -46,24 +52,28 @@
   
         authentication = pkgs.lib.mkOverride 10 ''
           # TYPE  DATABASE        USER            ADDRESS                 METHOD
-           local   all             all                                     trust
-         
-           # Matches any address currently bound to this host's own interfaces —
-           # no need to hardcode LAN subnet, VPN subnet, etc.
-           host    all             all             samehost                trust
-         
-           # Docker container subnet — this is Docker's own internal addressing,
-           # not your LAN, so it's not the kind of hardcoding you're trying to avoid.
-           host    all             all             172.17.0.0/16            trust
+          
+          # 1. ALLOW SYSTEM ADMIN: The 'postgres' superuser must use OS-level 'peer' auth
+          local   all             postgres                                peer
+          
+          # 2. ALLOW LOCAL SCRIPTS: Let your systemd scripts (like tb-init) connect locally
+          local   all             all                                     trust
+          
+          # 3. LOCK DOWN NETWORK: Require strict passwords for local TCP
+          host    all             all             samehost                scram-sha-256
+          
+          # 4. LOCK DOWN DOCKER: Require strict passwords for containers
+          host    all             all             172.17.0.0/16           scram-sha-256
         '';
       };
     };
 
     systemd.tmpfiles.rules = [
-      # The 'z' type ensures permissions are applied recursively 
-      # and sets the folder up before the service starts.
       "d /mnt/data/postgresql 0750 postgres postgres -"
       "d /mnt/data/postgresql/data 0700 postgres postgres -"
+      
+      # Ensure the host creates the root Docker folder before Docker starts
+      "d /mnt/data/docker 0711 root root -"
     ];
     
     environment.variables = {

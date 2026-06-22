@@ -1254,11 +1254,11 @@
         "zen-browser": "zen-browser"
       },
       "locked": {
-        "lastModified": 1782130388,
-        "narHash": "sha256-5aAyDoF5pldBvEaBQYrwqsqQqy5D+T5nq4IjviZCKe0=",
+        "lastModified": 1782131693,
+        "narHash": "sha256-kHix2fdyljGZwjBsh1ueizQmTlAVqk9wZSrgz2pzaMc=",
         "owner": "0xnryn",
         "repo": "opinions",
-        "rev": "e659e86366a0a17ff8081589514029db64e6697b",
+        "rev": "6a3b682a93556d39f6eadd1db4950b41b3ee0e75",
         "type": "github"
       },
       "original": {
