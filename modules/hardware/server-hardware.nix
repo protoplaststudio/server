@@ -35,6 +35,7 @@
         main = {
           device = "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5"; 
           type = "disk";
+          bootloader = null;
           content = {
             type = "gpt";
             partitions = {
