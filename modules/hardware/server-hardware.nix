@@ -25,7 +25,10 @@
       loader.grub = {
         enable = true;
         efiSupport = true;
-        # Install the Legacy GRUB payload directly to the disk's MBR
+        # --- THE FIX ---
+        # Tells GRUB to put the EFI file in the default /EFI/BOOT/BOOTX64.EFI location
+        # and prevents it from running efibootmgr (which is crashing)
+        efiInstallAsRemovable = true; 
         device = lib.mkDefault "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5"; 
       };
   
