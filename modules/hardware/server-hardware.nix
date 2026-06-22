@@ -11,7 +11,7 @@
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
     boot = {
-      boot.loader.grub = {
+      loader.grub = {
         enable = true;
         efiSupport = false; # Required for Legacy/BIOS
         device = "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5"; 
