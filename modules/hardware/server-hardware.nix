@@ -1,10 +1,10 @@
 { inputs, lib, ... }:
+# ls -l /dev/disk/by-id/
 {
   flake.nixosModules.server-hardware = { pkgs, config, modulesPath,... }: {
 
     imports = [ 
       inputs.disko.nixosModules.disko
-      inputs.lanzaboote.nixosModules.lanzaboote # Inject Secure Boot framework
       (modulesPath + "/installer/scan/not-detected.nix") 
     ];
     
@@ -18,8 +18,16 @@
       kernelModules = [ "kvm-intel" ];
       
       # Standard systemd-boot must be turned OFF for lanzaboote to manage the EFI stub
-      loader.systemd-boot.enable = true;
+      loader.systemd-boot.enable = lib.mkForce false;
       loader.efi.canTouchEfiVariables = true;
+
+      # Enable GRUB as the universal bootloader
+      loader.grub = {
+        enable = true;
+        efiSupport = true;
+        # Install the Legacy GRUB payload directly to the disk's MBR
+        device = lib.mkDefault "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5"; 
+      };
   
       initrd.availableKernelModules = [ 
         "nvme" "xhci_pci" "usb_storage" "usbhid" "sd_mod" "tpm_crb" "tpm_tis" 
@@ -30,18 +38,26 @@
     hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
 
-    # 1. DISKO LAYOUT (1GB EFI + LUKS Encrypted EXT4)
     disko.devices = {
       disk = {
         main = {
-          # Change this to match your actual disk path (e.g., /dev/sda or /dev/nvme0n1)
-          device = lib.mkDefault "/dev/sda"; 
+          device = lib.mkDefault "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5"; 
           type = "disk";
           content = {
             type = "gpt";
             partitions = {
+                          
+              # 1. LEGACY BOOTLOADER SPACE (1 MiB to 2 MiB)
+              bios_boot = {
+                start = "1MiB";      # Starts at 1st Megabyte
+                end = "2MiB";        # Ends at 2nd Megabyte
+                type = "EF02";       
+              };
+
+              # 2. UEFI BOOTLOADER SPACE (Almost 1 GiB)
               ESP = {
-                size = "1G";
+                start = "2MiB";      # Starts right where legacy ends
+                end = "1GiB";        # Ends exactly at the 1 GiB mark
                 type = "EF00";
                 content = {
                   type = "filesystem";
@@ -50,18 +66,37 @@
                   mountOptions = [ "umask=0077" ];
                 };
               };
+
+              # 3. NIXOS ROOT (Exactly 99 GiB)
               root = {
-                size = "100%";
+                start = "1GiB";      # Starts exactly at the 1 GiB mark
+                end = "100GiB";      # Ends exactly at the 100 GiB mark
                 content = {
                   type = "filesystem";
                   format = "ext4";
                   mountpoint = "/";
                 };
               };
-            };
+
+              # 4. IMMUTABLE DATA VAULT
+              # The Indestructible Border is now locked cleanly at 100 GiB
+              data = {
+                start = "100GiB";    
+                end = "100%"; 
+                # No content block - Format manually
+                # sudo mkfs.ext4 /dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5-part4
+                # sudo mount -a
+              };
+            };          
           };
         };
       };
+    };
+    
+    fileSystems."/mnt/data" = {
+      device = "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5-part4"; 
+      fsType = "ext4"; 
+      options = [ "nofail" ];
     };
   };
 }
