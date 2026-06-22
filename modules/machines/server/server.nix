@@ -46,13 +46,19 @@ flakeContext@{ inputs, ... }:
           owner = config.users.users.cloudflared.name;
           group = config.users.groups.cloudflared.name;
         };
-        
         # command to generate yggdrasil key
         # nix run nixpkgs#yggdrasil -- -useconffile <(yggdrasil -genconf -json) -exportkey
         sops.secrets."yggdrasil" = {
           sopsFile = "${inputs.self}/secrets/${hostName}.yaml";
           format = "yaml";
         };
+        systemd.tmpfiles.rules = [
+          # f = create a file if it doesn't exist
+          # 0400 = Read-only for owner, nothing for others
+          # root = owner
+          # root = group
+          "f /etc/${config.networking.hostName}boot.txt 0400 root root -"
+        ];
       }; 
     }; 
   };
