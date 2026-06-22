@@ -14,7 +14,6 @@
       loader.grub = {
         enable = true;
         efiSupport = false; # Required for Legacy/BIOS
-        device = "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5"; 
       };
       initrd.systemd.enable = true;      
       binfmt.emulatedSystems = [ "aarch64-linux" ];
