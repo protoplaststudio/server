@@ -46,15 +46,15 @@
   
         authentication = pkgs.lib.mkOverride 10 ''
           # TYPE  DATABASE        USER            ADDRESS                 METHOD
-          local   all             all                                     trust
-          host    all             all             127.0.0.1/32            trust
-          
-          # Allow Docker container subnet (Standard Docker Bridge)
-          host    all             all             172.17.0.0/16           trust
-          
-          # Allow access from the host itself using the Docker bridge IP
-          # This covers the tb-init service running as a systemd service
-          host    all             all             172.17.0.1/32           trust
+           local   all             all                                     trust
+         
+           # Matches any address currently bound to this host's own interfaces —
+           # no need to hardcode LAN subnet, VPN subnet, etc.
+           host    all             all             samehost                trust
+         
+           # Docker container subnet — this is Docker's own internal addressing,
+           # not your LAN, so it's not the kind of hardcoding you're trying to avoid.
+           host    all             all             172.17.0.0/16            trust
         '';
       };
     };
