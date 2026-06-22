@@ -16,17 +16,6 @@
       kernelPackages = pkgs.linuxPackages_latest;
       extraModulePackages = [ config.boot.kernelPackages.zenpower ];
       kernelModules = [ "kvm-intel" ];
-      
-      loader.grub = {
-        enable = true;
-        
-        # Explicitly turn off all modern EFI features
-        efiSupport = false; 
-        
-        # Install GRUB directly to the master boot record of the physical drive
-        device = lib.mkDefault "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5"; 
-      };
-  
       initrd.availableKernelModules = [ 
         "nvme" "xhci_pci" "usb_storage" "usbhid" "sd_mod" "tpm_crb" "tpm_tis" 
       ];
@@ -41,6 +30,7 @@
         main = {
           device = "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5"; 
           type = "disk";
+          bootloader = "grub";
           content = {
             type = "gpt";
             partitions = {
