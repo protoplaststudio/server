@@ -30,7 +30,28 @@
         enable = true;
         nssmdns4 = true; 
       };
+      
+      postgresql = {
+        enable = true;
+        package = pkgs.postgresql_18; # Or your preferred version
+        # THIS IS THE MAGIC: Point the DB to your persistent vault
+        dataDir = "/mnt/data/postgresql/data";
+        authentication = pkgs.lib.mkOverride 10 ''
+          # TYPE  DATABASE        USER            ADDRESS                 METHOD
+          local   all             all                                     trust
+          host    all             all             127.0.0.1/32            trust
+        '';
+      };
+  
+      
     };
+
+    systemd.tmpfiles.rules = [
+          # The 'z' type ensures permissions are applied recursively 
+          # and sets the folder up before the service starts.
+          "d /mnt/data/postgresql 0750 postgres postgres -"
+          "d /mnt/data/postgresql/data 0700 postgres postgres -"
+        ];
     
     environment.variables = {
       EDITOR = "nano"; VISUAL = "nano"; 
