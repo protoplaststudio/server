@@ -19,7 +19,7 @@
       
       # Standard systemd-boot must be turned OFF for lanzaboote to manage the EFI stub
       loader.systemd-boot.enable = lib.mkForce false;
-      loader.efi.canTouchEfiVariables = true;
+      loader.efi.canTouchEfiVariables = false;
 
       # Enable GRUB as the universal bootloader
       loader.grub = {
