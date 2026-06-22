@@ -13,8 +13,9 @@ flakeContext@{ inputs, ... }:
       in
       {
         networking = {
-          networkmanager.enable = true;
           inherit hostName;
+          networkmanager.enable = true;
+          firewall.enable = true;
         };
         imports =   
         [ 

@@ -75,8 +75,7 @@
       yggdrasil
     ];
     networking = {
-      networkmanager.enable = true;
-      firewall.enable = true;
+      
     };
 
     services.yggdrasil = {
@@ -114,8 +113,9 @@
       };
     };
     networking.firewall = {
-      allowedTCPPorts = [ 53535 9001];
-      allowedUDPPorts = [ 53535 9001];
+      trustedInterfaces = [ "docker0" ]; 
+      allowedTCPPorts = [ 53535 9001 ];
+      allowedUDPPorts = [ 53535 9001 ];
     };
   };
 }
