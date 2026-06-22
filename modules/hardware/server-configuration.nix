@@ -39,20 +39,24 @@
         package = pkgs.postgresql_18;
         dataDir = "/mnt/data/postgresql/data";
         
-        # --- ADD THIS SETTING ---
         settings = {
+          # Listen on localhost and the Docker bridge specifically
           listen_addresses = lib.mkForce "127.0.0.1, 172.17.0.1";
         };
-
+  
         authentication = pkgs.lib.mkOverride 10 ''
           # TYPE  DATABASE        USER            ADDRESS                 METHOD
           local   all             all                                     trust
           host    all             all             127.0.0.1/32            trust
-          # --- ADD THIS LINE TO ALLOW DOCKER ACCESS ---
+          
+          # Allow Docker container subnet (Standard Docker Bridge)
           host    all             all             172.17.0.0/16           trust
+          
+          # Allow access from the host itself using the Docker bridge IP
+          # This covers the tb-init service running as a systemd service
+          host    all             all             172.17.0.1/32           trust
         '';
       };
-    };
 
     systemd.tmpfiles.rules = [
       # The 'z' type ensures permissions are applied recursively 
