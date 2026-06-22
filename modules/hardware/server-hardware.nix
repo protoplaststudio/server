@@ -80,7 +80,8 @@
         };
       };
     };
-    
+    # mkfs.ext4 /dev/sda4
+    # mount -a
     fileSystems."/mnt/data" = {
       device = "/dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5-part4"; 
       fsType = "ext4"; 
