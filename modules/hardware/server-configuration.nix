@@ -46,8 +46,8 @@
         dataDir = "/mnt/data/postgresql/data";
         
         settings = {
-          # Listen on localhost and the Docker bridge specifically
-          listen_addresses = lib.mkForce "127.0.0.1, 172.17.0.1";
+          # Use the wildcard to avoid the Docker race condition on boot
+          listen_addresses = lib.mkForce "*";
         };
   
         authentication = pkgs.lib.mkOverride 10 ''
@@ -70,9 +70,7 @@
 
     systemd.tmpfiles.rules = [
       "d /mnt/data/postgresql 0750 postgres postgres -"
-      "d /mnt/data/postgresql/data 0700 postgres postgres -"
-      
-      # Ensure the host creates the root Docker folder before Docker starts
+      "d /mnt/data/postgresql/data 0700 postgres postgres -"      
       "d /mnt/data/docker 0711 root root -"
     ];
     
