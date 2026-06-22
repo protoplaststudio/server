@@ -20,7 +20,7 @@ sudo SOPS_AGE_KEY_FILE=/etc/laptopboot.txt EDITOR=nano sops secrets/laptop.yaml
 nix --extra-experimental-features "nix-command flakes" run nixpkgs#age-plugin-tpm -- --generate -o /etc/serverboot.txt
 
 
-NIX_CONFIG="experimental-features = nix-command flakes pipe-operators" nix run github:nix-community/disko -- --mode disko --flake .#protoplast-server
+
 
 NIX_CONFIG="experimental-features = nix-command flakes pipe-operators" nix run nixpkgs#disko -- --mode disko --flake github:protoplaststudio/server#protoplast-server
 
