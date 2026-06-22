@@ -30,6 +30,10 @@ flakeContext@{ inputs, ... }:
           format = "yaml";
           path = "/etc/ssh/ssh_host_ed25519_key"; # This is the symlink location
         };
+        sops.secrets."tb_db_password" = {
+          sopsFile = "${inputs.self}/secrets/${hostName}.yaml";
+          format = "yaml";
+        };
         users.users.sudha = {
           isNormalUser = true;
           extraGroups = [ "wheel" ];          
@@ -71,46 +75,6 @@ flakeContext@{ inputs, ... }:
         sops.secrets."yggdrasil" = {
           sopsFile = "${inputs.self}/secrets/${hostName}.yaml";
           format = "yaml";
-        };
-
-        networking.firewall = {
-          allowedTCPPorts = [ 53535 9001];
-          allowedUDPPorts = [ 53535 9001];
-        };
-      
-        services.yggdrasil = {
-          enable = true;
-          openMulticastPort = true;
-          settings = {
-            IfName = "ygg0";
-            Listen = [ "tcp://0.0.0.0:53535" ];
-            PrivateKeyPath = config.sops.secrets."yggdrasil".path; 
-            NodeInfoPrivacy = true;
-            Peers = [          # inputs.opinions.nixosModules.erpnext
-    
-              #india
-              "tls://ins.8px.sk:4321"
-              "quic://ins.8px.sk:4321"
-              #hongkong
-              "tcp://ygg5.mk16.de:1337?key=0000009611ae5391dc0aceea9f3fa6a0dc1279f4306059339e84bfb8b74d2f9b"
-              "tls://ygg5.mk16.de:1338?key=0000009611ae5391dc0aceea9f3fa6a0dc1279f4306059339e84bfb8b74d2f9b"
-              "quic://ygg5.mk16.de:1339?key=0000009611ae5391dc0aceea9f3fa6a0dc1279f4306059339e84bfb8b74d2f9b"
-              "ws://ygg5.mk16.de:1340?key=0000009611ae5391dc0aceea9f3fa6a0dc1279f4306059339e84bfb8b74d2f9b"
-              #singapore
-              "tls://asia.deinfra.org:15015"
-              "quic://asia.deinfra.org:15015"
-              "tcp://yg-sin.magicum.net:23901"
-              "tls://yg-sin.magicum.net:23900"
-            ];
-            MulticastInterfaces = [
-              {
-                Regex = ".*";  
-                Beacon = true; 
-                Listen = true; 
-                Port = 9001;   
-              }
-            ];
-          };
         };
       }; 
     }; 

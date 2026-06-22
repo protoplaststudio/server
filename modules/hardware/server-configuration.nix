@@ -1,14 +1,17 @@
 { ... }:
 {
-  flake.nixosModules.server-configuration = { pkgs, ... }: 
+  flake.nixosModules.server-configuration = { pkgs, config, ... }: 
   {
     
     nix = {
       settings = { 
-        experimental-features = [ "nix-command" "flakes" "pipe-operators" ];
+        experimental-features = [ 
+          "nix-command"
+          "flakes"
+          "pipe-operators"
+        ];
       };
     };
-    
     nixpkgs.config.allowUnfree = true;
     programs.nix-ld.enable = true;
     system.stateVersion = "26.05";
@@ -42,16 +45,14 @@
           host    all             all             127.0.0.1/32            trust
         '';
       };
-  
-      
     };
 
     systemd.tmpfiles.rules = [
-          # The 'z' type ensures permissions are applied recursively 
-          # and sets the folder up before the service starts.
-          "d /mnt/data/postgresql 0750 postgres postgres -"
-          "d /mnt/data/postgresql/data 0700 postgres postgres -"
-        ];
+      # The 'z' type ensures permissions are applied recursively 
+      # and sets the folder up before the service starts.
+      "d /mnt/data/postgresql 0750 postgres postgres -"
+      "d /mnt/data/postgresql/data 0700 postgres postgres -"
+    ];
     
     environment.variables = {
       EDITOR = "nano"; VISUAL = "nano"; 
@@ -76,6 +77,45 @@
     networking = {
       networkmanager.enable = true;
       firewall.enable = true;
+    };
+
+    services.yggdrasil = {
+      enable = true;
+      openMulticastPort = true;
+      settings = {
+        IfName = "ygg0";
+        Listen = [ "tcp://0.0.0.0:53535" ];
+        PrivateKeyPath = config.sops.secrets."yggdrasil".path; 
+        NodeInfoPrivacy = true;
+        Peers = [          # inputs.opinions.nixosModules.erpnext
+
+          #india
+          "tls://ins.8px.sk:4321"
+          "quic://ins.8px.sk:4321"
+          #hongkong
+          "tcp://ygg5.mk16.de:1337?key=0000009611ae5391dc0aceea9f3fa6a0dc1279f4306059339e84bfb8b74d2f9b"
+          "tls://ygg5.mk16.de:1338?key=0000009611ae5391dc0aceea9f3fa6a0dc1279f4306059339e84bfb8b74d2f9b"
+          "quic://ygg5.mk16.de:1339?key=0000009611ae5391dc0aceea9f3fa6a0dc1279f4306059339e84bfb8b74d2f9b"
+          "ws://ygg5.mk16.de:1340?key=0000009611ae5391dc0aceea9f3fa6a0dc1279f4306059339e84bfb8b74d2f9b"
+          #singapore
+          "tls://asia.deinfra.org:15015"
+          "quic://asia.deinfra.org:15015"
+          "tcp://yg-sin.magicum.net:23901"
+          "tls://yg-sin.magicum.net:23900"
+        ];
+        MulticastInterfaces = [
+          {
+            Regex = ".*";  
+            Beacon = true; 
+            Listen = true; 
+            Port = 9001;   
+          }
+        ];
+      };
+    };
+    networking.firewall = {
+      allowedTCPPorts = [ 53535 9001];
+      allowedUDPPorts = [ 53535 9001];
     };
   };
 }
