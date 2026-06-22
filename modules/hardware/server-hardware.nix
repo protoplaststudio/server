@@ -45,19 +45,15 @@
           type = "disk";
           content = {
             type = "gpt";
-            partitions = {
-                          
-              # 1. LEGACY BOOTLOADER SPACE (1 MiB to 2 MiB)
+            partitions = {                                      
               bios_boot = {
-                start = "1M";      # Starts at 1st Megabyte
-                end = "2M";        # Ends at 2nd Megabyte
+                start = "1M";
+                end = "2M";
                 type = "EF02";       
               };
-
-              # 2. UEFI BOOTLOADER SPACE (Almost 1 GiB)
               ESP = {
-                start = "2M";      # Starts right where legacy ends
-                end = "1026M";        # Ends exactly at the 1 GiB mark
+                start = "2M";
+                end = "1026M";     
                 type = "EF00";
                 content = {
                   type = "filesystem";
@@ -66,26 +62,18 @@
                   mountOptions = [ "umask=0077" ];
                 };
               };
-
-              # 3. NIXOS ROOT (Exactly 99 GiB)
               root = {
-                start = "1026M";      # Starts exactly at the 1 GiB mark
-                end = "100G";      # Ends exactly at the 100 GiB mark
+                start = "1026M";
+                end = "100G";      
                 content = {
                   type = "filesystem";
                   format = "ext4";
                   mountpoint = "/";
                 };
               };
-
-              # 4. IMMUTABLE DATA VAULT
-              # The Indestructible Border is now locked cleanly at 100 GiB
               data = {
                 start = "100G";    
                 end = "100%"; 
-                # No content block - Format manually
-                # sudo mkfs.ext4 /dev/disk/by-id/ata-WDC_WD5000AAKX-22ERMA0_WD-WCC2E2YDJFH5-part4
-                # sudo mount -a
               };
             };          
           };
