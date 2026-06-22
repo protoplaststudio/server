@@ -1,6 +1,6 @@
 { ... }:
 {
-  flake.nixosModules.server-configuration = { pkgs, config, ... }: 
+  flake.nixosModules.server-configuration = { pkgs, config, lib, ... }: 
   {
     
     nix = {
@@ -36,13 +36,20 @@
       
       postgresql = {
         enable = true;
-        package = pkgs.postgresql_18; # Or your preferred version
-        # THIS IS THE MAGIC: Point the DB to your persistent vault
+        package = pkgs.postgresql_18;
         dataDir = "/mnt/data/postgresql/data";
+        
+        # --- ADD THIS SETTING ---
+        settings = {
+          listen_addresses = lib.mkForce "127.0.0.1, 172.17.0.1";
+        };
+
         authentication = pkgs.lib.mkOverride 10 ''
           # TYPE  DATABASE        USER            ADDRESS                 METHOD
           local   all             all                                     trust
           host    all             all             127.0.0.1/32            trust
+          # --- ADD THIS LINE TO ALLOW DOCKER ACCESS ---
+          host    all             all             172.17.0.0/16           trust
         '';
       };
     };
