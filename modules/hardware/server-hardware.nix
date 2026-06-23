@@ -10,6 +10,13 @@
     
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
+    zramSwap = {
+      enable = true;
+      memoryPercent = 50; # Compress up to 50% of RAM (Yields ~4GB extra headroom)
+    };
+    # Tell the Linux Kernel to NEVER use the mechanical HDD for swap unless absolutely necessary
+    boot.
+
     boot = {
       loader.grub = {
         enable = true;
@@ -23,6 +30,7 @@
       initrd.availableKernelModules = [ 
         "nvme" "xhci_pci" "usb_storage" "usbhid" "sd_mod" "tpm_crb" "tpm_tis" 
       ];
+      kernel.sysctl."vm.swappiness" = 10;
       initrd.kernelModules = [ ];
     };
 
