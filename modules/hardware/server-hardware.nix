@@ -14,8 +14,6 @@
       enable = true;
       memoryPercent = 50; # Compress up to 50% of RAM (Yields ~4GB extra headroom)
     };
-    # Tell the Linux Kernel to NEVER use the mechanical HDD for swap unless absolutely necessary
-    boot.
 
     boot = {
       loader.grub = {
