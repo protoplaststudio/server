@@ -23,7 +23,7 @@ flakeContext@{ inputs, ... }:
           inputs.self.nixosModules."${hostName}-hardware"
           inputs.self.nixosModules."${hostName}-configuration"
           inputs.opinions.nixosModules.protoplast_tb_postgres
-          inputs.opinions.nixosModules.protoplast_erpnext
+          # inputs.opinions.nixosModules.protoplast_erpnext
         ];
         sops.age.keyFile = "/etc/${hostName}boot.txt";
         sops.secrets."ssh/ssh_host_ed25519_key" = {
