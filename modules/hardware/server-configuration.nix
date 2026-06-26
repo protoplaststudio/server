@@ -27,7 +27,15 @@
       };
     };
     services = {
-      openssh.enable = true;
+      openssh = {
+          enable = true;
+          # Disable root login entirely
+          settings = {
+            PermitRootLogin = "no";
+            PasswordAuthentication = false; # Disables password login for ALL users
+            KbdInteractiveAuthentication = false;
+          };
+        };
       pipewire = {
         enable = true;
         pulse.enable = true;

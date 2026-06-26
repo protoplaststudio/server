@@ -37,8 +37,12 @@ flakeContext@{ inputs, ... }:
         };
         users.users.sudha = {
           isNormalUser = true;
-          extraGroups = [ "wheel" ];          
-          # hashedPasswordFile = config.sops.secrets."sudha-login-password".path;
+          extraGroups = [ "wheel" ];
+          openssh.authorizedKeys.keys = [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB2Rzz/tv3QxX2d0BuYV6DJRRAzcY7j2dfiQ+GcOTB4L u0_a240@localhost"
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4TE/APdx0IU0wXNtmQaJK98Or3TwqRwEBS2bQNOpfO sudha"
+            
+          ];
         };
         sops.secrets."cloudflare" = {
           sopsFile = "${inputs.self}/secrets/${hostName}.yaml";
