@@ -9,7 +9,7 @@ flakeContext@{ inputs, ... }:
       system = "x86_64-linux";
       module = { config, pkgs, ... }:
       let
-        hostName = "server";
+        hostName = "protoplast-server";
       in
       {
         networking = {
@@ -52,9 +52,9 @@ flakeContext@{ inputs, ... }:
           sopsFile = "${inputs.self}/secrets/${hostName}.yaml";
           format = "yaml";
         };
-        sops.secrets."protoplast_erpnext" = {
-          sopsFile = "${inputs.self}/secrets/${hostName}.yaml";
-          format = "yaml";
+        sops.secrets."erpnext.env" = {
+          sopsFile = "${inputs.self}/secrets/${config.networking.hostName}-erpnext.env";
+          format = "dotenv";
         };
         systemd.tmpfiles.rules = [
           # f = create a file if it doesn't exist
