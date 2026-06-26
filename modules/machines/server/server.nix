@@ -23,7 +23,7 @@ flakeContext@{ inputs, ... }:
           inputs.self.nixosModules."${hostName}-hardware"
           inputs.self.nixosModules."${hostName}-configuration"
           inputs.opinions.nixosModules.protoplast_tb_postgres
-          inputs.opinions.nixosModules.protoplast_erpnext
+          # inputs.opinions.nixosModules.protoplast_erpnext
         ];
         sops.age.keyFile = "/etc/${hostName}boot.txt";
         sops.secrets."ssh/ssh_host_ed25519_key" = {
@@ -52,13 +52,7 @@ flakeContext@{ inputs, ... }:
           sopsFile = "${inputs.self}/secrets/${hostName}.yaml";
           format = "yaml";
         };
-        # DB_PASS=$(cat /run/secrets/erpnext_db_password)
-        # ADMIN_PASS=$(cat /run/secrets/erpnext_admin_password)
-        sops.secrets."erpnext_db_password" = {
-          sopsFile = "${inputs.self}/secrets/${hostName}.yaml";
-          format = "yaml";
-        };
-        sops.secrets."erpnext_admin_password" = {
+        sops.secrets."protoplpast_erpnext" = {
           sopsFile = "${inputs.self}/secrets/${hostName}.yaml";
           format = "yaml";
         };
