@@ -52,7 +52,7 @@ flakeContext@{ inputs, ... }:
           sopsFile = "${inputs.self}/secrets/${hostName}.yaml";
           format = "yaml";
         };
-        sops.secrets."protoplpast_erpnext" = {
+        sops.secrets."protoplast_erpnext" = {
           sopsFile = "${inputs.self}/secrets/${hostName}.yaml";
           format = "yaml";
         };
